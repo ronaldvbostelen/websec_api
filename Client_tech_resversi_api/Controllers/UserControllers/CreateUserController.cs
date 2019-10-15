@@ -30,10 +30,12 @@ namespace Client_tech_resversi_api.Controllers
         private readonly IPasswordManager _passwordManger;
         private readonly IStringValidator _stringValidator;
         private readonly IHashGenerator _hashGenerator;
+        private readonly IEmailer _emailer;
 
         public CreateUserController(ReversiContext context, IPasswordManager passwordManager, IStringValidator stringValidator, 
-            IHashGenerator hashGenerator, ILogger<CreateUserController> logger)
+            IHashGenerator hashGenerator, ILogger<CreateUserController> logger, IEmailer emailer)
         {
+            _emailer = emailer;
             _logger = logger;
             _hashGenerator = hashGenerator;
             _stringValidator = stringValidator;
@@ -139,7 +141,7 @@ namespace Client_tech_resversi_api.Controllers
 
             try
             {
-                await new Emailer().SendActivationMailAsync(new MailboxAddress(user.Email), user.ScreenName, activationKey);
+                await _emailer.SendActivationMailAsync(new MailboxAddress(user.Email), user.ScreenName, activationKey);
             }
             catch (Exception e)
             {

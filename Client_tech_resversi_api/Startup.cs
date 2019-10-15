@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Client_tech_resversi_api.Assets;
 using Client_tech_resversi_api.Assets.Interfaces;
 using Client_tech_resversi_api.Models;
+using Client_tech_resversi_api.Models.Non_DB_models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
@@ -74,6 +75,8 @@ namespace Client_tech_resversi_api
             services.AddScoped<IStringValidator, StringValidator>();
             services.AddScoped<IHashGenerator, HashGenerator>();
             services.AddScoped<IDataSeeder, DataSeeder>();
+            services.AddScoped<IMailTransferAgent, MailClient>();
+            services.AddScoped<IEmailer, Emailer>();
             
             services.Configure<MvcOptions>(opt => { opt.Filters.Add(new CorsAuthorizationFilterFactory("AllowMyOrigin")); });
             services.AddMvc()
@@ -81,6 +84,8 @@ namespace Client_tech_resversi_api
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddHttpContextAccessor();
+
+            services.Configure<SmtpUser>(Configuration.GetSection("smtp"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

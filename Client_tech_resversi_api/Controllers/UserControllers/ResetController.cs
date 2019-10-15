@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Client_tech_resversi_api.Assets;
 using Client_tech_resversi_api.Assets.Extensions;
+using Client_tech_resversi_api.Assets.Interfaces;
 using Client_tech_resversi_api.Migrations;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -25,9 +26,11 @@ namespace Client_tech_resversi_api.Controllers
     {
         private readonly ReversiContext _context;
         private readonly ILogger<ResetController> _logger;
+        private readonly IEmailer _emailer;
 
-        public ResetController(ReversiContext context, ILogger<ResetController> logger)
+        public ResetController(ReversiContext context, ILogger<ResetController> logger, IEmailer emailer)
         {
+            _emailer = emailer;
             _logger = logger;
             _context = context;
         }
@@ -152,7 +155,7 @@ namespace Client_tech_resversi_api.Controllers
                 return StatusCode(500);
             }
 
-            await new Emailer().SendRecoverMailAsync(new MailboxAddress(user.Email), user.ScreenName, recoverycode);
+            await _emailer.SendRecoverMailAsync(new MailboxAddress(user.Email), user.ScreenName, recoverycode);
             
             return Ok(new { user.Id, securityHash });
         }
