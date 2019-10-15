@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Client_tech_resversi_api.Assets;
 using Client_tech_resversi_api.Assets.Extensions;
+using Client_tech_resversi_api.Assets.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -21,9 +22,11 @@ namespace Client_tech_resversi_api.Controllers
     {
         private readonly ReversiContext _context;
         private readonly ILogger<UserAccountController> _logger;
+        private readonly IEmailer _emailer;
 
-        public UserAccountController(ReversiContext context, ILogger<UserAccountController> logger)
+        public UserAccountController(ReversiContext context, ILogger<UserAccountController> logger, IEmailer emailer)
         {
+            _emailer = emailer;
             _logger = logger;
             _context = context;
         }
@@ -59,7 +62,7 @@ namespace Client_tech_resversi_api.Controllers
             try
             {
                 await _context.SaveChangesAsync();
-                await new Emailer().SendActivationMailAsync(new MailboxAddress(dbUser.Email), dbUser.ScreenName, activationKey);
+                await _emailer.SendActivationMailAsync(new MailboxAddress(dbUser.Email), dbUser.ScreenName, activationKey);
             }
             catch (Exception e)
             {
